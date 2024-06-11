@@ -1,0 +1,30 @@
+name: Release
+on:
+    push:
+        branches:
+            - master
+
+permissions:
+    contents: write
+    discussions: write
+    packages: write
+
+concurrency:
+    group: release-${{github.ref}}
+    cancel-in-progress: true
+
+jobs:
+    release:
+        name: Release
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.workflow_run.head_branch }}
+
+            - uses: buckhamduffy/release-drafter@v1
+              id: version
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  master_branch: main

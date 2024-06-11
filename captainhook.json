@@ -1,0 +1,65 @@
+{
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\CogCommitMessageAction"
+            }
+        ]
+    },
+    "pre-push": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\CogPrePushAction"
+            }
+        ]
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\PHP\\Action\\Linting"
+            },
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\PhpstanAction"
+            },
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\GithubActionLintAction"
+            },
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\EcsAction"
+            },
+            {
+                "action": "\\BuckhamDuffy\\CodingStandards\\CaptainHook\\EslintAction"
+            }
+        ]
+    },
+    "prepare-commit-msg": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-commit": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-merge": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-checkout": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-rewrite": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-change": {
+        "enabled": false,
+        "actions": []
+    },
+    "config": {
+        "fail-on-first-error": false
+    }
+}

@@ -1,0 +1,79 @@
+{
+    "name": "buckhamduffy/bd-support",
+    "description": "This is my package bd-support",
+    "keywords": [
+        "BuckhamDuffy",
+        "laravel",
+        "bd-support"
+    ],
+    "homepage": "https://github.com/buckhamduffy/bd-support",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aaron Florey",
+            "email": "aaron@buckhamduffy.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0",
+        "illuminate/support": "^11.0",
+        "prewk/serialized-to-ast": "^0.1.0",
+        "sentry/sentry-laravel": "^4.6",
+        "spatie/laravel-package-tools": "^1.16",
+        "spatie/php-structure-discoverer": "^2.1",
+        "symfony/process": "^7.1"
+    },
+    "require-dev": {
+        "buckhamduffy/coding-standards": "^6.1.0",
+        "captainhook/captainhook-phar": "^5.23.1",
+        "captainhook/hook-installer": "^1.0",
+        "irazasyed/docgen": "^0.2.0",
+        "nunomaduro/collision": "^8.1.1||^7.10.0",
+        "spatie/laravel-ray": "^1.36"
+    },
+    "autoload": {
+        "files": [
+            "src/Helpers/functions.php"
+        ],
+        "psr-4": {
+            "BuckhamDuffy\\BdSupport\\": "src/",
+            "BuckhamDuffy\\BdSupport\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BuckhamDuffy\\BdSupport\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "post-install-cmd": [
+            "vendor/bin/captainhook install -q --only-enabled -n"
+        ],
+        "post-update-cmd": [
+            "vendor/bin/captainhook install -q --only-enabled -n"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "captainhook/captainhook-phar": true,
+            "captainhook/hook-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BuckhamDuffy\\BdSupport\\BdSupportServiceProvider"
+            ],
+            "aliases": {
+                "BdSupport": "BuckhamDuffy\\BdSupport\\Facades\\BdSupport",
+                "DBG": "Debug"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

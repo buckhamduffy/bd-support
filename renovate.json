@@ -1,0 +1,20 @@
+{
+  "extends" : [
+    "github>buckhamduffy/renovate-config"
+  ],
+  "baseBranches" : [
+    "master"
+  ],
+  "packageRules" : [
+    {
+      "matchUpdateTypes" : [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge" : true,
+      "automergeType" : "pr"
+    }
+  ]
+}
