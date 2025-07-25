@@ -13,6 +13,9 @@ class Period
 	private ?CarbonPeriodImmutable $period = null;
 	private CarbonImmutable $from;
 	private CarbonImmutable $to;
+	private int $padLength = 2;
+	private array $indexes = [];
+	private PeriodDb $dbHelper;
 
 	public function __construct(
 		DateTimeInterface|string $from,
@@ -23,14 +26,12 @@ class Period
 	{
 		$this->from = CarbonImmutable::parse($from)->startOfDay();
 		$this->to = CarbonImmutable::parse($to)->endOfDay();
+
+		$totalPeriods = iterator_count($this->iterate());
+		$this->padLength = \strlen((string) $totalPeriods);
 	}
 
-	public static function make(
-		DateTimeInterface|string $from,
-		DateTimeInterface|string $to,
-		?PeriodInterval $interval = null,
-		int $intervalCount = 1
-	): self
+	public static function make(DateTimeInterface|string $from, DateTimeInterface|string $to, ?PeriodInterval $interval = null, int $intervalCount = 1): self
 	{
 		return new self($from, $to, $interval, $intervalCount);
 	}
@@ -54,7 +55,6 @@ class Period
 		$diffInDays = $this->getFrom()->diffInDays($this->getTo());
 
 		return match (true) {
-			$diffInDays < 14  => PeriodInterval::DAY,
 			$diffInDays > 365 => PeriodInterval::YEAR,
 			$diffInDays > 60  => PeriodInterval::MONTH,
 			$diffInDays > 14  => PeriodInterval::WEEK,
@@ -71,19 +71,22 @@ class Period
 		$period = CarbonPeriodImmutable::start($this->getFrom());
 
 		$interval = match ($this->getInterval()) {
-			PeriodInterval::DAY   => 'days',
-			PeriodInterval::WEEK  => 'weeks',
-			PeriodInterval::MONTH => 'months',
-			PeriodInterval::YEAR  => 'years',
+			PeriodInterval::DAY  => 'days',
+			PeriodInterval::WEEK => 'weeks',
+			PeriodInterval::MONTH, PeriodInterval::QUARTER => 'months',
+			PeriodInterval::YEAR => 'years',
 		};
 
-		$period = $period->{$interval}($this->intervalCount);
+		// If the interval is quarters, multiply the interval count by 3 to get the equivalent in months
+		$intervalCount = $this->getInterval() === PeriodInterval::QUARTER ? $this->intervalCount * 3 : $this->intervalCount;
+
+		$period = $period->{$interval}($intervalCount);
 
 		return $this->period = $period->until($this->getTo());
 	}
 
 	/**
-	 * @return Generator<int, array{0: CarbonImmutable, 1: CarbonImmutable}>
+	 * @return Generator<array-key, array{0: CarbonImmutable, 1: CarbonImmutable}>
 	 */
 	public function iterate(): Generator
 	{
@@ -91,16 +94,66 @@ class Period
 			$from = CarbonImmutable::parse($period);
 
 			$to = match ($this->getInterval()) {
-				PeriodInterval::DAY   => $from->addDays($this->intervalCount),
-				PeriodInterval::WEEK  => $from->addWeeks($this->intervalCount),
-				PeriodInterval::MONTH => $from->addMonths($this->intervalCount),
-				PeriodInterval::YEAR  => $from->addYears($this->intervalCount),
+				PeriodInterval::DAY     => $from->addDays($this->intervalCount),
+				PeriodInterval::WEEK    => $from->addWeeks($this->intervalCount),
+				PeriodInterval::MONTH   => $from->addMonths($this->intervalCount),
+				PeriodInterval::YEAR    => $from->addYears($this->intervalCount),
+				PeriodInterval::QUARTER => $from->addQuarter(),
 			};
 
-			$to = $to->isAfter($this->getTo()) ? $this->getTo() : $to->subSecond();
+			if ($to->isAfter($this->getTo())) {
+				$to = $this->getTo();
+			} else {
+				$to = $to->subSecond();
+			}
 
 			yield [$from, $to];
 		}
+	}
+
+	/**
+	 * @return Generator<string>
+	 */
+	public function iterateFormatted(bool $humanReadable = false): Generator
+	{
+		foreach ($this->iterate() as [$from, $to]) {
+			yield match ($this->getInterval()) {
+				PeriodInterval::DAY     => $from->format($humanReadable ? 'd/m/Y' : 'Y-m-d'),
+				PeriodInterval::WEEK    => $to->format($humanReadable ? 'd/m/Y' : 'Y-m-d'),
+				PeriodInterval::MONTH   => $from->format($humanReadable ? 'M y' : 'Y-m-01'),
+				PeriodInterval::YEAR    => $from->format('Y'),
+				PeriodInterval::QUARTER => 'Q' . $from->quarter . ' ' . $from->format('y'),
+			};
+		}
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function indexes(): array
+	{
+		if (\count($this->indexes)) {
+			return $this->indexes;
+		}
+
+		foreach ($this->iterate() as $index => $value) {
+			$this->indexes[] = $index;
+		}
+
+		return $this->indexes;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function keys(): array
+	{
+		return array_map(fn ($index) => $this->getPeriodIndex($index), $this->indexes());
+	}
+
+	public function toDb(): array
+	{
+		return $this->dbHelper()->toDb();
 	}
 
 	/**
@@ -112,37 +165,31 @@ class Period
 	}
 
 	/**
-	 * @return Generator<int, string>
+	 * @return array<int, string>
 	 */
-	public function iterateDisplay(): Generator
+	public function toList(string $format = 'Y-m-d'): array
 	{
-		foreach ($this->iterate() as [$from, $to]) {
-			yield match ($this->getInterval()) {
-				PeriodInterval::DAY   => $from->format('Y-m-d'),
-				PeriodInterval::WEEK  => $from->format('Y-m-d') . ' to ' . $to->format('Y-m-d'),
-				PeriodInterval::MONTH => $from->format('M'),
-				PeriodInterval::YEAR  => $from->format('Y'),
-			};
-		}
+		return array_values(array_map(function(array $span) use ($format) {
+			return $span[0]->format($format);
+		}, $this->toArray()));
 	}
 
-	/**
-	 * @return string[]
-	 */
-	public function toDisplayArray(): array
+	public function toCategories(): array
 	{
-		return iterator_to_array($this->iterateDisplay());
+		return iterator_to_array($this->iterateFormatted(true));
 	}
 
-	/**
-	 * @return array{0: string, 1: string}
-	 */
-	public function toDb(bool $includeTime = false): array
+	public function getPeriodIndex(int $index): string
 	{
-		if ($includeTime) {
-			return [$this->getFrom()->toDateTimeString(), $this->getTo()->toDateTimeString()];
+		return 'period_' . str_pad((string) $index, $this->padLength, '0', \STR_PAD_LEFT);
+	}
+
+	public function dbHelper(): PeriodDb
+	{
+		if (isset($this->dbHelper)) {
+			return $this->dbHelper->setPeriod($this);
 		}
 
-		return [$this->getFrom()->toDateString(), $this->getTo()->toDateString()];
+		return $this->dbHelper = new PeriodDb($this);
 	}
 }

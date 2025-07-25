@@ -12,6 +12,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use BuckhamDuffy\BdSupport\Commands\TypescriptEnumCommand;
 use BuckhamDuffy\BdSupport\Listeners\Queue\JobTimeoutListener;
 use BuckhamDuffy\BdSupport\Listeners\Queue\JobExceptionListener;
+use BuckhamDuffy\BdSupport\Commands\SynapseSendHealthcheckEmailCommand;
 
 class BdSupportServiceProvider extends PackageServiceProvider
 {
@@ -23,19 +24,22 @@ class BdSupportServiceProvider extends PackageServiceProvider
 		 * More info: https://github.com/spatie/laravel-package-tools
 		 */
 		$package->name('bd-support')
-			->hasCommand(TypescriptEnumCommand::class);
+			->hasConfigFile()
+			->hasRoute('web')
+			->hasCommand(TypescriptEnumCommand::class)
+			->hasCommand(SynapseSendHealthcheckEmailCommand::class);
 	}
 
 	public function boot(): void
 	{
 		parent::boot();
 
-		$this->app['events']->listen(JobProcessing::class, JobSentryCapture::class);
-		$this->app['events']->listen(JobExceptionOccurred::class, JobExceptionListener::class);
-		$this->app['events']->listen(JobTimedOut::class, JobTimeoutListener::class);
+		if (config('bd-support.enable_queue_debugging')) {
+			$this->app['events']->listen(JobProcessing::class, JobSentryCapture::class);
+			$this->app['events']->listen(JobExceptionOccurred::class, JobExceptionListener::class);
+			$this->app['events']->listen(JobTimedOut::class, JobTimeoutListener::class);
+		}
 
-		$this->app->bind(FluentArr::class, function($app) {
-			return FluentArr::make($app['request']->all());
-		});
+		$this->app->bind(FluentArr::class, fn ($app) => FluentArr::make($app['request']->all()));
 	}
 }

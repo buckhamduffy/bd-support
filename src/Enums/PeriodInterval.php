@@ -8,4 +8,5 @@ enum PeriodInterval
 	case WEEK;
 	case MONTH;
 	case YEAR;
+	case QUARTER;
 }

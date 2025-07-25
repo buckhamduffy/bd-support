@@ -299,6 +299,6 @@ class FluentArr
 	{
 		$value = $this->input($key, $default);
 
-		return !\is_bool($value) && !\is_array($value) && blank($value);
+		return \is_string($value) && blank($value);
 	}
 }

@@ -3,12 +3,14 @@
 namespace BuckhamDuffy\BdSupport\Services;
 
 use Throwable;
-use Prewk\SerializedToAst;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Model;
 use BuckhamDuffy\BdSupport\Facades\Debug;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Contracts\Database\ModelIdentifier;
+use Mochaka\SerializationParser\Data\ClassType;
+use Mochaka\SerializationParser\Data\FloatType;
+use Mochaka\SerializationParser\Data\BooleanType;
+use Mochaka\SerializationParser\Data\IntegerType;
+use Mochaka\SerializationParser\SerializationParser;
+use Mochaka\SerializationParser\Interfaces\TypeInterface;
 
 /**
  * @phpstan-type AstType array{type: string, value: mixed}
@@ -59,24 +61,15 @@ class JobSentryCapture
 
 	public function process(): void
 	{
-		$parser = new SerializedToAst();
-		/** @var AstObj $ast */
-		$ast = $parser->parse($this->serializedCommand)->toArray();
+		/** @var ClassType $parser */
+		$parser = SerializationParser::parse($this->serializedCommand);
 
-		if ($name = Arr::get($ast, 'name')) {
+		if ($name = $parser->getName()) {
 			Debug::tag('job.class', $name);
 		}
 
-		foreach (Arr::get($ast, 'public_properties', []) as $property => $value) {
-			$this->processProperty($property, $value ?: []);
-		}
-
-		foreach (Arr::get($ast, 'protected_properties', []) as $property => $value) {
-			$this->processProperty($property, $value ?: []);
-		}
-
-		foreach (Arr::get($ast, 'private_properties', []) as $property => $value) {
-			$this->processProperty($property, $value ?: []);
+		foreach ($parser->getProperties() as $property) {
+			$this->processProperty($property);
 		}
 
 		if (\count($this->context)) {
@@ -92,68 +85,30 @@ class JobSentryCapture
 		}
 	}
 
-	private function processProperty(string $name, array $ast): void
+	private function processProperty(TypeInterface $property): void
 	{
-		if (\in_array($name, $this->ignoredProperties)) {
+		if (\in_array($property->getName(), $this->ignoredProperties)) {
 			return;
 		}
 
-		$type = Arr::get($ast, 'type');
-		$value = Arr::get($ast, 'value');
-
-		if (!$type) {
-			return;
-		}
-
-		if (\in_array($type, ['int', 'float', 'string', 'bool'])) {
-			$this->context[$name] = $value;
+		if ($property instanceof IntegerType || $property instanceof FloatType || $property instanceof BooleanType) {
+			$this->context[$property->getName()] = $property->getValue();
 
 			return;
 		}
 
-		if ($type == 'array') {
-			$this->context[$name] = 'array[filtered]';
+		if ($property->isArray() && $property->getName()) {
+			$this->context[$property->getName()] = 'array[filtered]';
 
 			return;
 		}
 
-		if ($type === 'object') {
-			$this->processObject($ast);
-
-			return;
+		if ($property instanceof ClassType) {
+			$this->processObject($property);
 		}
 	}
 
-	private function processObject(array $ast): void
+	private function processObject(ClassType $property): void
 	{
-		$className = Arr::get($ast, 'name');
-
-		if (!$className) {
-			return;
-		}
-
-		if (!class_exists($className)) {
-			return;
-		}
-
-		if ($className === ModelIdentifier::class) {
-			$this->tags[] = [
-				'key'   => class_basename(Arr::get($ast, 'public_properties.class.value')),
-				'value' => Arr::get($ast, 'public_properties.id.value'),
-			];
-
-			return;
-		}
-
-		$parents = class_parents($className);
-
-		if (!\in_array(Model::class, $parents)) {
-			return;
-		}
-
-		$this->tags[] = [
-			'key'   => class_basename($className),
-			'value' => Arr::get($ast, 'protected_properties.attributes.items.id.value'),
-		];
 	}
 }

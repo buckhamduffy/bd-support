@@ -17,19 +17,19 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/contracts": "^11.0",
-        "illuminate/support": "^11.0",
-        "prewk/serialized-to-ast": "^0.1.0",
+        "buckhamduffy/laravel-expressions": "^1.7",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0",
+        "mochaka/serialization-parser": "^1.0",
         "sentry/sentry-laravel": "^4.6",
         "spatie/laravel-package-tools": "^1.16",
         "spatie/php-structure-discoverer": "^2.1",
         "symfony/process": "^7.1"
     },
     "require-dev": {
-        "buckhamduffy/coding-standards": "^6.1.0",
+        "buckhamduffy/coding-standards": "^7.0",
         "captainhook/captainhook-phar": "^5.23.1",
         "captainhook/hook-installer": "^1.0",
-        "irazasyed/docgen": "^0.2.0",
         "nunomaduro/collision": "^8.1.1||^7.10.0",
         "spatie/laravel-ray": "^1.36"
     },

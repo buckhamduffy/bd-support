@@ -1,6 +1,19 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#1 \\$type of method BuckhamDuffy\\\\BdSupport\\\\Support\\\\DocGen\\:\\:getTypeName\\(\\) expects ReflectionNamedType\\|ReflectionUnionType, ReflectionType given\\.$#"
+			message: '#^Parameter \#1 \$type of method BuckhamDuffy\\BdSupport\\Support\\DocGen\:\:getTypeName\(\) expects ReflectionNamedType\|ReflectionUnionType, ReflectionType given\.$#'
+			identifier: argument.type
 			count: 2
 			path: src/Support/DocGen.php
+
+		-
+			message: '#^Trait App\\Http\\Controllers\\Auth\\CustomThrottlesLogins is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Traits/Auth/CustomThrottlesLogins.php
+
+		-
+			message: '#^Trait BuckhamDuffy\\BdSupport\\Traits\\EnumArray is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Traits/EnumArray.php

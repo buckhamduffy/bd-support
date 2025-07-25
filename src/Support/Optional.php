@@ -8,24 +8,22 @@ use Illuminate\Support\Arr;
 /**
  * @template TValue
  * @mixin TValue
- * @implements \ArrayAccess<key-of<TValue>, value-of<TValue>>
+ * @implements ArrayAccess<key-of<TValue>, value-of<TValue>>
  */
 class Optional implements ArrayAccess
 {
-	/**
-	 * The underlying object.
-	 * @var TValue
-	 */
-	protected mixed $value;
-
 	/**
 	 * Create a new optional instance.
 	 *
 	 * @param TValue $value
 	 */
-	public function __construct(mixed $value)
+	public function __construct(
+		/**
+		 * The underlying object.
+		 */
+		protected mixed $value
+	)
 	{
-		$this->value = $value;
 	}
 
 	/**
@@ -52,7 +50,7 @@ class Optional implements ArrayAccess
 	 * @param  key-of<TValue> $name
 	 * @return bool
 	 */
-	public function __isset($name)
+	public function __isset(mixed $name)
 	{
 		if (\is_object($this->value)) {
 			return isset($this->value->{$name});

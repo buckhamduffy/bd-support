@@ -11,11 +11,24 @@ You can install the package via composer:
 composer require buckhamduffy/bd-support
 ```
 
-## Usage
+### Health
 
+##### app/Console/Kernel.php
 ```php
-\DBG::capture($exception);
+protected function schedule(Schedule $schedule): void {
+	$schedule->command('synapse:send-healthcheck-email')->everyTenMinutes();
+}
 ```
+
+##### /.synapse/info
+information for /.synapse/info is pulled from the `bd-support.php` config file.
+```env
+APP_ENV=production
+COMMIT_SHA=6e9fa3fc2095d7a74732c2dba6295b61fd8c46db
+GIT_BRANCH=master
+BRANCH_NAME=master
+SENTRY_RELEASE=v1.0.0
+````
 
 ## Testing
 

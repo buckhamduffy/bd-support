@@ -2,6 +2,8 @@
 
 namespace BuckhamDuffy\BdSupport\Support;
 
+use function Laravel\Prompts\info;
+
 use JsonException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -21,7 +23,7 @@ class DocGen
 			->get();
 
 		foreach ($classes as $class) {
-			\Laravel\Prompts\info("Generating DocBlock for {$class}");
+			info('Generating DocBlock for ' . $class);
 			$this->generate($class);
 		}
 	}
@@ -78,7 +80,7 @@ class DocGen
 			$paramStrings = $this->getParamStrings($method, $class);
 			$returnString = $this->getReturnString($method, $class);
 
-			$lines[] = sprintf(' * @method static %s %s(%s)', $returnString, $method->getName(), $paramStrings);
+			$lines[] = \sprintf(' * @method static %s %s(%s)', $returnString, $method->getName(), $paramStrings);
 		}
 
 		$lines[] = '*/';

@@ -1,6 +1,10 @@
 name: Coverage
 on:
     push:
+        branches:
+            - master
+            - main
+            - staging
     pull_request:
         branches:
             - master
@@ -21,7 +25,7 @@ jobs:
             - name: Setup PHP with PECL extension
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: "8.2"
+                  php-version: "8.3"
                   tools: composer:v2
 
             - uses: ramsey/composer-install@v3
@@ -38,7 +42,7 @@ jobs:
             - name: Setup PHP with PECL extension
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: "8.2"
+                  php-version: "8.3"
                   tools: composer:v2
 
             - uses: ramsey/composer-install@v3

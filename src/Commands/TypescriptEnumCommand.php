@@ -57,12 +57,12 @@ class TypescriptEnumCommand extends Command
 		$cases = EnumParser::getOptions($enum);
 
 		foreach ($cases as $case) {
-			$lines[] = sprintf('export const %s = %s;', $case['name'], var_export($case['value'], true));
+			$lines[] = \sprintf('export const %s = %s;', $case['name'], var_export($case['value'], true));
 		}
 
 		$lines[] = '';
 
-		$lines[] = sprintf(
+		$lines[] = \sprintf(
 			'export const %s = %s;',
 			Str::camel(class_basename($enum)),
 			json_encode($cases, \JSON_PRETTY_PRINT)

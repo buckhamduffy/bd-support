@@ -29,3 +29,10 @@ if (!\function_exists('captureTag')) {
 		Debug::tag($key, $value);
 	}
 }
+
+if (!\function_exists('fluent_array')) {
+	function fluent_array(array $array): BuckhamDuffy\BdSupport\Services\FluentArr
+	{
+		return new BuckhamDuffy\BdSupport\Services\FluentArr($array);
+	}
+}

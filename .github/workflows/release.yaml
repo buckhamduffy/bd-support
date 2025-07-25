@@ -2,7 +2,7 @@ name: Release
 on:
     push:
         branches:
-            - master
+            - main
 
 permissions:
     contents: write
@@ -21,10 +21,10 @@ jobs:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-                  ref: ${{ github.event.workflow_run.head_branch }}
 
             - uses: buckhamduffy/release-drafter@v1
               id: version
+              with:
+                  master_branch: main
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  master_branch: main

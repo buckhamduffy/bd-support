@@ -1,5 +1,5 @@
 ignore_merge_commits = true
-branch_whitelist = ["master", "release/*", "staging", "main"]
+branch_whitelist = ["main"]
 pre_bump_hooks = []
 post_bump_hooks = []
 tag_prefix = "v"
