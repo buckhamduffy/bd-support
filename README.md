@@ -8,7 +8,7 @@
 You can install the package via composer:
 
 ```bash
-composer require buckhamduffy/bd-support
+composer require buckhamduffy/support
 ```
 
 ### Health
