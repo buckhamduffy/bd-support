@@ -39,6 +39,9 @@ class Debug
 		return $this;
 	}
 
+	/**
+	 * @return Optional<Ray>|Ray
+	 */
 	public function ray(mixed ...$params): Ray|Optional
 	{
 		if (!app()->environment('local', 'testing')) {
@@ -62,8 +65,6 @@ class Debug
 			$scope->setTag($key, $value);
 		});
 
-		$this->ray([$key => $value])->label('Tag');
-
 		return $this;
 	}
 
@@ -72,8 +73,6 @@ class Debug
 		$this->sentry()->configureScope(function(Scope $scope) use ($key, $value): void {
 			$scope->setContext($key, $value);
 		});
-
-		$this->ray([$key => $value])->label('Context');
 
 		return $this;
 	}

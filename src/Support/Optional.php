@@ -14,8 +14,6 @@ class Optional implements ArrayAccess
 {
 	/**
 	 * Create a new optional instance.
-	 *
-	 * @param TValue $value
 	 */
 	public function __construct(
 		/**
