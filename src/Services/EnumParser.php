@@ -55,21 +55,40 @@ class EnumParser
 
 		if ($reflection->isBacked()) {
 			return static::$options[$enum] = array_map(fn (ReflectionEnumBackedCase $case): array => [
-				'text'  => static::humanReadableKey($case->getName()),
+				'text'  => static::humanReadable($case),
 				'value' => $case->getBackingValue(),
 				'name'  => $case->getName()
 			], $reflection->getCases());
 		}
 
 		return static::$options[$enum] = array_map(fn (ReflectionEnumUnitCase $case): array => [
-			'text'  => static::humanReadableKey($case->getName()),
+			'text'  => static::humanReadable($case),
 			'value' => $case->getName(),
 			'name'  => $case->getName()
 		], $reflection->getCases());
 	}
 
-	public static function humanReadableKey(string $key): string
+	public static function humanReadable(ReflectionEnumBackedCase|ReflectionEnumUnitCase $reflection): string
 	{
-		return preg_replace('/([a-z])([A-Z])/', '$1 $2', Str::studly($key));
+		$name = $reflection->getName();
+		if ($reflection instanceof ReflectionEnumBackedCase) {
+			$value = $reflection->getBackingValue();
+		} else {
+			$value = $name;
+		}
+
+		if (strtoupper($value) !== $value) {
+			if (!str_contains($value, ' ')) {
+				return Str::headline($value);
+			}
+
+			return $value;
+		}
+
+		if (strtoupper($name) !== $name) {
+			return Str::headline($name);
+		}
+
+		return $value;
 	}
 }

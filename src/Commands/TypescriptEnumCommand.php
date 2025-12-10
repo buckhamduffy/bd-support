@@ -6,6 +6,7 @@ use function Laravel\Prompts\spin;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\table;
 
+use Throwable;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -34,7 +35,11 @@ class TypescriptEnumCommand extends Command
 		}
 
 		foreach ($enums as $enum) {
-			$this->processEnum($enum);
+			try {
+				$this->processEnum($enum);
+			} catch (Throwable $e) {
+				error("Failed to process enum: {$enum} - " . $e->getMessage());
+			}
 		}
 
 		table(['Enum', 'Path'], $this->enums);
@@ -75,6 +80,7 @@ class TypescriptEnumCommand extends Command
 	{
 		$path = resource_path('enums');
 		$parts = explode('\\', $enum);
+		array_pop($parts); // Remove root namespace
 
 		$count = \count($parts);
 		while ($count > 1) {

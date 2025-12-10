@@ -16,9 +16,7 @@ class Optional implements ArrayAccess
 	 * Create a new optional instance.
 	 */
 	public function __construct(
-		/**
-		 * The underlying object.
-		 */
+		/** The underlying object. */
 		protected mixed $value
 	)
 	{
