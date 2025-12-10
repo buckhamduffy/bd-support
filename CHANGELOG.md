@@ -3,6 +3,12 @@
 All notable changes to `bd-support` will be documented in this file.
 
 - - -
+## v0.2.1 - 2025-12-10
+#### Bug Fixes
+- improve enum naming - (a776b27) - Aaron Florey
+
+- - -
+
 ## v0.2.0 - 2025-08-13
 #### Bug Fixes
 - change package name - (50318f0) - Aaron Florey
