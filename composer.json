@@ -27,7 +27,7 @@
         "symfony/process": "^7.4"
     },
     "require-dev": {
-        "buckhamduffy/coding-standards": "^7.0.3",
+        "buckhamduffy/coding-standards": "^8.0.0",
         "captainhook/captainhook-phar": "^5.27.3",
         "captainhook/hook-installer": "^1.0.4",
         "nunomaduro/collision": "^8.8.3||^7.10.0",
