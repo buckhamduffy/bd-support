@@ -3,6 +3,12 @@
 All notable changes to `bd-support` will be documented in this file.
 
 - - -
+## v0.3.0 - 2026-05-07
+#### Features
+- allow laravel 13 - (70ad380) - Aaron Florey
+
+- - -
+
 ## v0.2.1 - 2025-12-10
 #### Bug Fixes
 - improve enum naming - (a776b27) - Aaron Florey
