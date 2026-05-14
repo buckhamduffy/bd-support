@@ -18,11 +18,11 @@ jobs:
         name: Release
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
               with:
                   fetch-depth: 0
 
-            - uses: buckhamduffy/release-drafter@v1
+            - uses: buckhamduffy/release-drafter@20021c8ddccbc28fc87056f2f660772ad59cec47 # v1
               id: version
               with:
                   master_branch: main
