@@ -28,7 +28,7 @@ jobs:
                   php-version: "8.3"
                   tools: composer:v2
 
-            - uses: ramsey/composer-install@v3
+            - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             - name: Execute ECS
               run: php -d memory_limit=-1 vendor/bin/ecs check src
@@ -45,7 +45,7 @@ jobs:
                   php-version: "8.3"
                   tools: composer:v2
 
-            - uses: ramsey/composer-install@v3
+            - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             - name: Execute PHPStan
               run: php -d memory_limit=-1 vendor/bin/phpstan analyse src
