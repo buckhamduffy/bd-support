@@ -3,6 +3,12 @@
 All notable changes to `bd-support` will be documented in this file.
 
 - - -
+## v0.3.1 - 2026-08-13
+#### Bug Fixes
+- allow newer symfony - (ba3c70c) - Aaron Florey
+
+- - -
+
 ## v0.3.0 - 2026-05-07
 #### Features
 - allow laravel 13 - (70ad380) - Aaron Florey
